@@ -27,7 +27,7 @@ while True:
         if count == 2:
             if event.type == pg.MOUSEBUTTONDOWN and event.button == 3:
                 vx, vy = (pg.mouse.get_pos()[0] - x)/10, (pg.mouse.get_pos()[1] - y)/10
-                lst.apend(f.objects(f.Object(x, y, rad**2 * 1000, vx, vy)))
+                lst.append(f.OBJECT(x, y, rad**2 * 1000, vx, vy))
                 count = 0
 
 

@@ -21,7 +21,7 @@ def vector_between(obj1, obj2):
     return (obj2.x - obj1.x)/dist(obj1, obj2), (obj2.y - obj1.y)/dist(obj1, obj2)
 
 
-class Object:
+class OBJECT:
     def __init__(self, x, y, mas, vx=0, vy=0):
         # Initialize attributes
         self.x = x
