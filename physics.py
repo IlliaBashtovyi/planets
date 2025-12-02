@@ -53,6 +53,7 @@ class Object:
 
 # times per second
 time = 10
-density = 100000  # density of objects kil per cubic meter
+# density of objects kil per cubic meter
+density = 100000
 
 
