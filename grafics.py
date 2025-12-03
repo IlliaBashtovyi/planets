@@ -1,33 +1,32 @@
+# python
 import pygame as pg
 import physics as ph
 
+screen = None
+font = None
 
-# start graphics function
 def start_graphics():
-    global screen
+    global screen, font
     pg.init()
     pg.display.set_caption("Gravity Simulation")
-    screen = pg.display.set_mode((800, 600))
+    # Open a fullscreen window
+    screen = pg.display.set_mode((0, 0), pg.FULLSCREEN)
+    font = pg.font.SysFont(None, 24)
 
-
-# draw objects function
 def draw_objects(objects, mult=None):
-    # same display
-    global screen
+    global screen, font
     screen.fill((0, 0, 0))  # Clear screen with black
+
     for obj in objects:
-        # Draw each object as a circle with random color
         pg.draw.circle(screen, obj.color, (int(obj.x), int(obj.y)), int(obj.size))
 
-        # draw time multiplier
+    # draw time multiplier once per frame
+    if font is None:
         font = pg.font.SysFont(None, 24)
-        text_surface = font.render(f'Time multiplier: {mult}', True, (255, 255, 255))
-        screen.blit(text_surface, (10, 10))  # Position the text at (10, 10)
-        # Update the display
+    text_surface = font.render(f'Time multiplier: {mult}', True, (255, 255, 255))
+    screen.blit(text_surface, (10, 10))
+
     pg.display.flip()
 
-
-# quit graphics function
-
-
-pg.quit()
+def stop_graphics():
+    pg.quit()

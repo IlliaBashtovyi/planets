@@ -5,7 +5,7 @@ import random as r
 one pixel is one meter
 time is how many times per second the calculations are done
 mas is in kilograms
-velocity is in meters per second
+velocity is in kilometers per second
 density is in kilograms per cubic meter
 '''
 # Function to calculate the distance between two objects
@@ -36,7 +36,7 @@ class OBJECT:
         self.vx = vx
         self.vy = vy
         self.size = size
-        self.m = size ** 3 * density * 4/3 * m.pi  # mass calculation size is radius
+        self.m = size ** 3 * density * 4/3 * m.pi * (1000 ** 3) # mass calculation size is radius
         self.color = (r.randrange(0, 255), r.randrange(0, 255), r.randrange(0, 255))
 
 
@@ -49,7 +49,7 @@ class OBJECT:
         # Method to calculate acceleration due to another object
         G = 6.67430e-11  # Gravitational constant
         distance = dist(self, obj)
-        ac = G * obj.m / (distance**2)
+        ac = G * obj.m / (distance**2 * 1000)
         ax = ac * (obj.x - self.x) / distance
         ay = ac * (obj.y - self.y) / distance
         self.vx += ax / time

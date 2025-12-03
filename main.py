@@ -30,7 +30,8 @@ while runing:
                 count += 1
         # set radius of new object
         if count == 1:
-            if event.type == pg.MOUSEBUTTONUP and event.button == 1:
+            if event.type == pg.MOUSEBUTTONDOWN and event.button == 3:
+                print(1)
                 rad = ph.dist_points(x, y, *pg.mouse.get_pos())
                 count += 1
         # set velocity of new object and create it
