@@ -5,13 +5,18 @@ import physics as ph
 screen = None
 font = None
 
-def start_graphics():
+def start_graphics(width=800, height=600):
     global screen, font
     pg.init()
     pg.display.set_caption("Gravity Simulation")
-    # Open a fullscreen window
-    screen = pg.display.set_mode((0, 0), pg.FULLSCREEN)
+    # create a resizable window (not fullscreen)
+    screen = pg.display.set_mode((width, height), pg.RESIZABLE)
     font = pg.font.SysFont(None, 24)
+
+def resize(width, height):
+    global screen
+    # recreate the window at the new size while keeping it resizable
+    screen = pg.display.set_mode((width, height), pg.RESIZABLE)
 
 def draw_objects(objects, mult=None, creating=None):
     global screen, font
@@ -30,15 +35,20 @@ def draw_objects(objects, mult=None, creating=None):
         rad = creating.get('rad', 0)
         mouse_pos = creating.get('mouse_pos', (0,0))
 
+        # clamp radius so preview surface stays reasonable within current window
+        sw, sh = screen.get_size()
+        max_rad = min(sw, sh) // 2
+        rad_int = max(1, int(min(rad, max_rad)))
+
         # translucent surface for preview circle
         if stage >= 1 and rad > 0:
-            preview_surf = pg.Surface((rad*2+4, rad*2+4), pg.SRCALPHA)
+            preview_surf = pg.Surface((rad_int*2+4, rad_int*2+4), pg.SRCALPHA)
             preview_color = (200, 200, 255, 80)  # translucent bluish
-            pg.draw.circle(preview_surf, preview_color, (int(rad)+2, int(rad)+2), int(rad))
-            screen.blit(preview_surf, (cx - rad - 2, cy - rad - 2))
+            pg.draw.circle(preview_surf, preview_color, (rad_int+2, rad_int+2), rad_int)
+            screen.blit(preview_surf, (cx - rad_int - 2, cy - rad_int - 2))
 
             # outline
-            pg.draw.circle(screen, (200,200,255), (cx, cy), int(rad), 1)
+            pg.draw.circle(screen, (200,200,255), (cx, cy), rad_int, 1)
 
         # velocity vector preview (arrow)
         if stage == 2:

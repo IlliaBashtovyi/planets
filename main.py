@@ -3,12 +3,13 @@ import grafics as g
 import pygame as pg
 
 
-# start graphics
+# start graphics (now resizable)
 g.start_graphics()
 
 # to create consistent time steps
 clock = pg.time.Clock()
 mult = 1  # time multiplier
+
 # for creating objects
 count = 0
 x, y, vx, vy, rad = 0, 0, 0, 0, 0  # parameters for new object
@@ -30,11 +31,20 @@ while runing:
 
     # check for events
     for event in pg.event.get():
-        # stop if escape is pressed
+        # stop if escape is pressed or window closed
         if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
             runing = False
         elif event.type == pg.QUIT:
             runing = False
+
+        # handle window resize
+        if event.type == pg.VIDEORESIZE:
+            # recreate screen at new size (keeps resizable flag)
+            g.resize(event.w, event.h)
+
+        # clear all objects if 'c' is pressed
+        if event.type == pg.KEYDOWN and event.key == pg.K_c:
+            lst = []
 
         # set position of new object (first left click)
         if count == 0:
@@ -44,21 +54,23 @@ while runing:
                 vx = vy = 0
                 count = 1
                 creating['x'], creating['y'] = x, y
-        # set radius of new object (right click while previewing radius)
+
+        # set radius of new object (left click while previewing radius)
         elif count == 1:
             # update preview radius continuously
             if event.type == pg.MOUSEMOTION:
                 rad = ph.dist_points(x, y, *pg.mouse.get_pos())
-            if event.type == pg.MOUSEBUTTONDOWN and event.button == 3:
+            if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
                 rad = ph.dist_points(x, y, *pg.mouse.get_pos())
                 count = 2
+
         # set velocity of new object and create it (left click)
         elif count == 2:
             # update preview velocity vector continuously
             if event.type == pg.MOUSEMOTION:
-                vx, vy = (pg.mouse.get_pos()[0] - x)/10, (pg.mouse.get_pos()[1] - y)/10
+                vx, vy = (pg.mouse.get_pos()[0] - x), (pg.mouse.get_pos()[1] - y)
             if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
-                vx, vy = (pg.mouse.get_pos()[0] - x)/10, (pg.mouse.get_pos()[1] - y)/10
+                vx, vy = (pg.mouse.get_pos()[0] - x), (pg.mouse.get_pos()[1] - y)
                 lst.append(ph.OBJECT(x, y, rad, vx, vy))
                 # reset creation state
                 count = 0
@@ -75,9 +87,6 @@ while runing:
     if count == 1:
         rad = ph.dist_points(x, y, *mouse_pos)
         creating['rad'] = rad
-    if count == 2:
-        # update creating mouse_pos already set above; preview velocity will be drawn by grafics
-        pass
 
     # update physics
     # calculate acceleration
