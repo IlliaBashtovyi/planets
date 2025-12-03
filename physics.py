@@ -1,4 +1,5 @@
 import math as m
+import random as r
 
 '''
 one pixel is one meter
@@ -36,6 +37,7 @@ class OBJECT:
         self.vy = vy
         self.size = size
         self.m = size ** 3 * density * 4/3 * m.pi  # mass calculation size is radius
+        self.color = (r.randrange(0, 255), r.randrange(0, 255), r.randrange(0, 255))
 
 
     def move(self):
@@ -47,7 +49,7 @@ class OBJECT:
         # Method to calculate acceleration due to another object
         G = 6.67430e-11  # Gravitational constant
         distance = dist(self, obj)
-        ac = G * obj.m / distance**2
+        ac = G * obj.m / (distance**2)
         ax = ac * (obj.x - self.x) / distance
         ay = ac * (obj.y - self.y) / distance
         self.vx += ax / time
@@ -60,7 +62,7 @@ class OBJECT:
 
 
 
-time = 10
+time = 1000
 
 # density of steel
 dens = 7800
