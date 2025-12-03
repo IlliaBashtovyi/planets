@@ -1,6 +1,12 @@
 import math as m
 
-
+'''
+one pixel is one meter
+time is how many times per second the calculations are done
+mas is in kilograms
+velocity is in meters per second
+density is in kilograms per cubic meter
+'''
 # Function to calculate the distance between two objects
 def dist(obj1, obj2):
     return m.sqrt((obj2.x - obj1.x) ** 2 + (obj2.y - obj1.y) ** 2)
@@ -22,13 +28,15 @@ def vector_between(obj1, obj2):
 
 
 class OBJECT:
-    def __init__(self, x, y, mas, vx=0, vy=0):
+    def __init__(self, x, y, size, vx=0, vy=0, density=7800):
         # Initialize attributes
         self.x = x
         self.y = y
         self.vx = vx
         self.vy = vy
-        self.mas = mas
+        self.size = size
+        self.m = size ** 3 * density * 4/3 * m.pi  # mass calculation size is radius
+
 
     def move(self):
         # Method to move the object
@@ -51,9 +59,10 @@ class OBJECT:
 
 
 
-# times per second
+
 time = 10
-# density of objects kil per cubic meter
-density = 100000
+
+# density of steel
+dens = 7800
 
 

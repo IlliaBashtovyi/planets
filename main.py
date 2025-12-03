@@ -31,7 +31,22 @@ while True:
                 count = 0
 
 
+# update physics
+    # calculate acceleration
+    for obj in lst:
+        for other in lst:
+            if obj != other:
+                obj.acceler(other)
+    # move objects
+    for obj in lst:
+        obj.move()
 
+# update graphics
+    g.draw_objects(lst)
+
+# draw velocity arrows
+if count == 2:
+    g.arow((x, y), pg.mouse.get_pos() )
 
 
 
