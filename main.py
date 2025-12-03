@@ -13,7 +13,11 @@ mult = 1  # time multiplier
 # for creating objects
 count = 0
 x, y, vx, vy, rad = 0, 0, 0, 0, 0  # parameters for new object
-lst = [ph.OBJECT(400, 300, 10, 0, 0, 50000)]  # list of objects
+lst = []  # list of objects
+
+# for moving screen
+dx, dy = 2, 2
+up, down, left, right = False, False, False, False
 
 # creation preview dict
 creating = {'stage': 0, 'x': 0, 'y': 0, 'rad': 0, 'mouse_pos': (0, 0)}
@@ -45,6 +49,26 @@ while runing:
         # clear all objects if 'c' is pressed
         if event.type == pg.KEYDOWN and event.key == pg.K_c:
             lst = []
+
+        # handle screen movement keys
+        if event.type == pg.KEYDOWN:
+            if event.key == pg.K_w:
+                up = True
+            if event.key == pg.K_s:
+                down = True
+            if event.key == pg.K_a:
+                left = True
+            if event.key == pg.K_d:
+                right = True
+        if event.type == pg.KEYUP:
+            if event.key == pg.K_w:
+                up = False
+            if event.key == pg.K_s:
+                down = False
+            if event.key == pg.K_a:
+                left = False
+            if event.key == pg.K_d:
+                right = False
 
         # set position of new object (first left click)
         if count == 0:
@@ -97,6 +121,20 @@ while runing:
     # move objects
     for obj in lst:
         obj.move()
+
+    # move screen if needed
+    if up:
+        for obj in lst:
+            obj.y += dy
+    if down:
+        for obj in lst:
+            obj.y -= dy
+    if left:
+        for obj in lst:
+            obj.x += dx
+    if right:
+        for obj in lst:
+            obj.x -= dx
 
     # update graphics (pass creation preview)
     g.draw_objects(lst, mult, creating)
