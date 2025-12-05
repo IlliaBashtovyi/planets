@@ -176,8 +176,6 @@ while runing:
         zoom *= 1.01
     if zoom_out:
         zoom /= 1.01
-    # clamp zoom to avoid degenerate values
-    zoom = max(0.01, min(100.0, zoom))
 
     # update graphics (pass creation preview and camera)
     g.draw_objects(lst, mult, creating, cam=(cam_x, cam_y), zoom=zoom)

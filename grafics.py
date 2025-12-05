@@ -99,7 +99,7 @@ def draw_objects(objects, mult=None, creating=None, cam=(0,0), zoom=1):
     # draw time multiplier once per frame
     if font is None:
         font = pg.font.SysFont(None, 24)
-    text_surface = font.render(f'Time multiplier: {mult}', True, (255, 255, 255))
+    text_surface = font.render(f'ZOOM: {100 * zoom}', True, (255, 255, 255))
     screen.blit(text_surface, (10, 10))
 
     pg.display.flip()
