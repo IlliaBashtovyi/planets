@@ -19,13 +19,26 @@ lst = []  # list of objects
 dx, dy = 2, 2
 up, down, left, right = False, False, False, False
 
-# creation preview dict
+# for zooming
+zoom_in, zoom_out = False, False
+zoom = 1
+
+# camera (world coords at screen center)
+cam_x, cam_y = 0.0, 0.0
+
+# creation preview dict (x,y are world coords)
 creating = {'stage': 0, 'x': 0, 'y': 0, 'rad': 0, 'mouse_pos': (0, 0)}
+
+def screen_to_world(sx, sy, cam_x, cam_y, zoom):
+    sw, sh = g.screen.get_size()
+    wx = cam_x + (sx - sw/2) / zoom
+    wy = cam_y + (sy - sh/2) / zoom
+    return wx, wy
 
 # main loop
 runing = True
 while runing:
-    # update live mouse position for preview
+    # update live mouse position for preview (screen coords)
     mouse_pos = pg.mouse.get_pos()
     creating['mouse_pos'] = mouse_pos
     creating['stage'] = count
@@ -50,8 +63,9 @@ while runing:
         if event.type == pg.KEYDOWN and event.key == pg.K_c:
             lst = []
 
-        # handle screen movement keys
+        # handle keys
         if event.type == pg.KEYDOWN:
+            # movement keys
             if event.key == pg.K_w:
                 up = True
             if event.key == pg.K_s:
@@ -60,7 +74,15 @@ while runing:
                 left = True
             if event.key == pg.K_d:
                 right = True
+
+            # zooming keys
+            if event.key == pg.K_q:
+                zoom_out = True
+            if event.key == pg.K_e:
+                zoom_in = True
+
         if event.type == pg.KEYUP:
+            # movement keys
             if event.key == pg.K_w:
                 up = False
             if event.key == pg.K_s:
@@ -70,10 +92,17 @@ while runing:
             if event.key == pg.K_d:
                 right = False
 
-        # set position of new object (first left click)
+            # zooming keys
+            if event.key == pg.K_q:
+                zoom_out = False
+            if event.key == pg.K_e:
+                zoom_in = False
+
+        # set position of new object (first left click) - convert screen -> world
         if count == 0:
             if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
-                x, y = pg.mouse.get_pos()
+                sx, sy = pg.mouse.get_pos()
+                x, y = screen_to_world(sx, sy, cam_x, cam_y, zoom)
                 rad = 0
                 vx = vy = 0
                 count = 1
@@ -81,20 +110,28 @@ while runing:
 
         # set radius of new object (left click while previewing radius)
         elif count == 1:
-            # update preview radius continuously
+            # update preview radius continuously (use world coords)
             if event.type == pg.MOUSEMOTION:
-                rad = ph.dist_points(x, y, *pg.mouse.get_pos())
+                mx, my = pg.mouse.get_pos()
+                mwx, mwy = screen_to_world(mx, my, cam_x, cam_y, zoom)
+                rad = ph.dist_points(x, y, mwx, mwy)
             if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
-                rad = ph.dist_points(x, y, *pg.mouse.get_pos())
+                mx, my = pg.mouse.get_pos()
+                mwx, mwy = screen_to_world(mx, my, cam_x, cam_y, zoom)
+                rad = ph.dist_points(x, y, mwx, mwy)
                 count = 2
 
         # set velocity of new object and create it (left click)
         elif count == 2:
             # update preview velocity vector continuously
             if event.type == pg.MOUSEMOTION:
-                vx, vy = (pg.mouse.get_pos()[0] - x), (pg.mouse.get_pos()[1] - y)
+                mx, my = pg.mouse.get_pos()
+                mwx, mwy = screen_to_world(mx, my, cam_x, cam_y, zoom)
+                vx, vy = (mwx - x), (mwy - y)
             if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
-                vx, vy = (pg.mouse.get_pos()[0] - x), (pg.mouse.get_pos()[1] - y)
+                mx, my = pg.mouse.get_pos()
+                mwx, mwy = screen_to_world(mx, my, cam_x, cam_y, zoom)
+                vx, vy = (mwx - x), (mwy - y)
                 lst.append(ph.OBJECT(x, y, rad, vx, vy))
                 # reset creation state
                 count = 0
@@ -109,7 +146,9 @@ while runing:
 
     # if user is in radius preview (mouse moved without event), update rad
     if count == 1:
-        rad = ph.dist_points(x, y, *mouse_pos)
+        mx, my = mouse_pos
+        mwx, mwy = screen_to_world(mx, my, cam_x, cam_y, zoom)
+        rad = ph.dist_points(x, y, mwx, mwy)
         creating['rad'] = rad
 
     # update physics
@@ -122,22 +161,26 @@ while runing:
     for obj in lst:
         obj.move()
 
-    # move screen if needed
+    # move camera (instead of moving objects)
     if up:
-        for obj in lst:
-            obj.y += dy
+        cam_y -= dy / zoom
     if down:
-        for obj in lst:
-            obj.y -= dy
+        cam_y += dy / zoom
     if left:
-        for obj in lst:
-            obj.x += dx
+        cam_x -= dx / zoom
     if right:
-        for obj in lst:
-            obj.x -= dx
+        cam_x += dx / zoom
 
-    # update graphics (pass creation preview)
-    g.draw_objects(lst, mult, creating)
+    # zoom if needed (zoom around screen center)
+    if zoom_in:
+        zoom *= 1.01
+    if zoom_out:
+        zoom /= 1.01
+    # clamp zoom to avoid degenerate values
+    zoom = max(0.01, min(100.0, zoom))
+
+    # update graphics (pass creation preview and camera)
+    g.draw_objects(lst, mult, creating, cam=(cam_x, cam_y), zoom=zoom)
 
     # cap the frame rate (avoid passing 0)
     target_fps = max(1, mult * ph.time)
