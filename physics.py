@@ -48,8 +48,8 @@ class OBJECT:
     def acceler(self, obj):
         # Method to calculate acceleration due to another object
         G = 6.67430e-11  # Gravitational constant
-        distance = dist(self, obj)
-        ac = G * obj.m / (distance**2 * 1000)
+        distance = dist(self, obj) * 1000  # convert to meters
+        ac = G * obj.m / (distance**2)  # acceleration calculation
         ax = ac * (obj.x - self.x) / distance
         ay = ac * (obj.y - self.y) / distance
         self.vx += ax / time
